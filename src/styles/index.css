@@ -1,0 +1,113 @@
+/* Fonts — latin subset only */
+@import '@fontsource/ibm-plex-sans/latin-400.css';
+@import '@fontsource/ibm-plex-sans/latin-500.css';
+@import '@fontsource/ibm-plex-sans/latin-600.css';
+@import '@fontsource/ibm-plex-sans-condensed/latin-700.css';
+
+@import 'tailwindcss';
+
+/* ─── Design tokens ─────────────────────────────────────────────────── */
+
+:root {
+  color-scheme: light dark;
+
+  --bg:      #FAFBFB; /* fondo base */
+  --bg-2:    #EEF1F4; /* bloques alternos */
+  --ink:     #0F2B47; /* titulares */
+  --text:    #3A4048; /* texto corrido */
+  --text-2:  #5F6B78; /* texto secundario */
+  --line:    #C5CBD1; /* líneas y bordes */
+  --brand:   #1E63B4; /* azul marca */
+  --cta:     #E2A318; /* amarillo seguridad: SOLO acción principal */
+  --cta-ink: #141B23; /* texto sobre el amarillo */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:      #0B1826;
+    --bg-2:    #0F2B47;
+    --ink:     #EEF1F4;
+    --text:    #C5CBD1;
+    --text-2:  #8E9AA8;
+    --line:    #274563;
+    --brand:   #5C9BE0;
+    --cta:     #E2A318;
+    --cta-ink: #141B23;
+  }
+}
+
+/* ─── Tailwind theme (inline = variables preserved at runtime) ───────── */
+
+@theme inline {
+  /* Colors */
+  --color-bg:      var(--bg);
+  --color-bg-2:    var(--bg-2);
+  --color-ink:     var(--ink);
+  --color-text:    var(--text);
+  --color-text-2:  var(--text-2);
+  --color-line:    var(--line);
+  --color-brand:   var(--brand);
+  --color-cta:     var(--cta);
+  --color-cta-ink: var(--cta-ink);
+
+  /* Font families */
+  --font-sans:      'IBM Plex Sans', system-ui, sans-serif;
+  --font-condensed: 'IBM Plex Sans Condensed', system-ui, sans-serif;
+}
+
+/* ─── Base styles ────────────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Smooth scroll — respects prefers-reduced-motion */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Keyboard focus — visible on all interactive elements */
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Screen-reader-only utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.sr-only:focus,
+.focus\:not-sr-only:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: revert;
+  margin: revert;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
