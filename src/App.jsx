@@ -3,6 +3,7 @@ import { Footer } from './components/layout/Footer.jsx'
 import { WhatsAppFloat } from './components/layout/WhatsAppFloat.jsx'
 import { Hero } from './components/sections/Hero.jsx'
 import { Problem } from './components/sections/Problem.jsx'
+import { Services } from './components/sections/Services.jsx'
 import { Section } from './components/ui/Section.jsx'
 
 /**
@@ -44,8 +45,8 @@ export default function App() {
         {/* 3 — La solución (fase posterior) */}
         <Section id="solucion" bg="bg" />
 
-        {/* 4 — Servicios (fase posterior) */}
-        <Section id="servicios" bg="bg-2" />
+        {/* 4 — Servicios */}
+        <Services />
 
         {/* 5 — Trayectoria y clientes (fase posterior) */}
         <Section id="clientes" bg="bg" />

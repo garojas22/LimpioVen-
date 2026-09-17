@@ -94,7 +94,7 @@ export const COPY = {
           'Baños y áreas sanitarias',
           'Centros comerciales, condominios y edificios',
         ],
-        image: null,
+        image: 'limpieza',
       },
       {
         id: '4.2',

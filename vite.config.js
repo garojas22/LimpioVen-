@@ -1,4 +1,5 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
+import { cwd } from 'process'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { SITE } from './src/config/site.js'
@@ -24,7 +25,7 @@ function isValidWhatsAppNumber(n) {
 }
 
 // ── JSON-LD ───────────────────────────────────────────────────────────────
-function buildJsonLd() {
+function buildJsonLd(whatsappNumber) {
   const data = {
     '@context': 'https://schema.org',
     '@type': 'ProfessionalService',
@@ -36,12 +37,12 @@ function buildJsonLd() {
     description: COPY.meta.description,
   }
   if (SITE.url) data.url = SITE.url
-  if (isValidWhatsAppNumber(SITE.whatsappNumber)) data.telephone = `+${SITE.whatsappNumber}`
+  if (isValidWhatsAppNumber(whatsappNumber)) data.telephone = `+${whatsappNumber}`
   return JSON.stringify(data, null, 2)
 }
 
 // ── Bloque de etiquetas <head> ────────────────────────────────────────────
-function buildMetaTags() {
+function buildMetaTags(whatsappNumber) {
   const tags = []
 
   // Título y descripción
@@ -94,18 +95,28 @@ function buildMetaTags() {
   }
 
   // JSON-LD
-  tags.push(`<script type="application/ld+json">\n${buildJsonLd()}\n</script>`)
+  tags.push(`<script type="application/ld+json">\n${buildJsonLd(whatsappNumber)}\n</script>`)
 
   return tags.join('\n    ')
 }
 
 // ── Plugin ────────────────────────────────────────────────────────────────
-function siteMetaPlugin() {
+function siteMetaPlugin(whatsappNumber, cfBeaconToken) {
   return {
     name: 'site-meta',
 
     transformIndexHtml(html) {
-      return html.replace('<!--__META__-->', buildMetaTags())
+      let out = html.replace('<!--__META__-->', buildMetaTags(whatsappNumber))
+
+      // Beacon de Cloudflare Web Analytics — solo en builds indexables con token configurado.
+      const analyticsScript =
+        indexable && cfBeaconToken
+          ? `<script defer src="https://static.cloudflareinsights.com/beacon.min.js"` +
+            ` data-cf-beacon='{"token":"${cfBeaconToken}"}'></script>`
+          : ''
+      out = out.replace('<!--__ANALYTICS__-->', analyticsScript)
+
+      return out
     },
 
     generateBundle() {
@@ -142,10 +153,16 @@ function siteMetaPlugin() {
   }
 }
 
-export default defineConfig({
-  plugins: [tailwindcss(), react(), siteMetaPlugin()],
-  test: {
-    environment: 'node',
-    include: ['src/**/*.test.{js,jsx}', 'build/**/*.test.{js,jsx}'],
-  },
+export default defineConfig(({ mode }) => {
+  const viteEnv = loadEnv(mode, cwd(), '')
+  const whatsappNumber = viteEnv.VITE_WHATSAPP_NUMBER ?? ''
+  const cfBeaconToken = viteEnv.VITE_CF_BEACON_TOKEN ?? ''
+
+  return {
+    plugins: [tailwindcss(), react(), siteMetaPlugin(whatsappNumber, cfBeaconToken)],
+    test: {
+      environment: 'node',
+      include: ['src/**/*.test.{js,jsx}', 'build/**/*.test.{js,jsx}'],
+    },
+  }
 })

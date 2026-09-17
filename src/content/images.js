@@ -9,6 +9,11 @@ export const IMAGES = {
     alt: '',
     label: 'Foto: cuadrilla uniformada en planta (pendiente)',
   },
+  limpieza: {
+    src: null,
+    alt: '',
+    label: 'Foto: área de producción o empaque en limpieza (pendiente)',
+  },
   sanitizacion: {
     src: null,
     alt: '',
