@@ -13,14 +13,14 @@
 
 ## Stack cerrado
 
-- **Vite + React (JavaScript)**
+- **Vite + React (JavaScript)**, desplegado en **Cloudflare Pages** mediante integración con GitHub.
 - **Tailwind CSS v4** con `@tailwindcss/vite`. Config en CSS, sin `tailwind.config.js`.
 - **Modo oscuro:** variables CSS en `:root` redefinidas en `@media (prefers-color-scheme: dark)`. Sin variantes `dark:` en componentes.
 - **Fuentes:** `@fontsource/ibm-plex-sans` (400, 500, 600) y `@fontsource/ibm-plex-sans-condensed` (700), subconjunto latino.
 - **Íconos:** `lucide-react`, importando por nombre.
 - **Formulario:** Web3Forms, `fetch` + `FormData`, sin preflight CORS. Clave en `site.js`.
-- **Analítica:** `@vercel/analytics`, todos los eventos vía `trackEvent()` en `src/lib/analytics.js`.
-- **Testing:** Vitest, solo para `src/lib/whatsapp.js`.
+- **Analítica:** pendiente de definir proveedor. Todas las llamadas pasan por `trackEvent()` en `src/lib/analytics.js` (no-op en prod, `console.debug` en dev). No tocar las llamadas existentes en componentes.
+- **Testing:** Vitest, para `src/lib/whatsapp.js` y `build/site-meta.js`.
 
 ## Tokens de color (sistema de diseño)
 
@@ -36,16 +36,37 @@ Los valores se definen en `src/styles/index.css`. El cambio de tema es automáti
 - Encabezados de sección: 22 px mínimo (escala con `clamp()`), `max-w-[24ch]`.
 - Sin mayúsculas sostenidas, sin "eyebrows", sin palabra resaltada con otro color en titulares.
 
+## Guarda de WhatsApp
+
+- `hasWhatsApp()` en `src/lib/whatsapp.js` es la única fuente de verdad. Devuelve `true` solo si `SITE.whatsappNumber` contiene exclusivamente dígitos (10–15 cifras).
+- Si `hasWhatsApp()` es `false`, no se renderizan: el botón flotante, el botón secundario de portada, ni la línea de WhatsApp en contacto (cuando se construya esa sección).
+- `buildWaUrl()` lanza error si se llama sin número válido.
+
+## Indexación y despliegue (Cloudflare Pages)
+
+- `SITE.published = false` hasta el lanzamiento público.
+- El plugin `siteMetaPlugin` de `vite.config.js` detecta el entorno con variables de Cloudflare (`CF_PAGES`, `CF_PAGES_BRANCH`, `CF_PAGES_URL`) y la variable manual `SITE_BASE_URL` (solo producción).
+- Un build de preview **nunca** es indexable, aunque `published` sea `true`.
+- El plugin emite `robots.txt`, `_headers` y, cuando es indexable, `sitemap.xml`. No hay `robots.txt` estático en `public/`.
+- La canonical y el `sitemap.xml` solo usan `SITE.url` (el dominio definitivo), nunca URLs temporales de Cloudflare.
+- La og:image siempre se referencia con URL absoluta. En local (sin URL base), se omite con un aviso en consola.
+- Las imágenes de redes sociales (`public/og-image.png`, `public/apple-touch-icon.png`) se generan con `npm run og` y se versionan en `public/`. No se regeneran en `npm run build`.
+
 ## Estructura de carpetas
 
 ```
+build/
+  site-meta.js           ← funciones puras de metadatos/indexación
+  site-meta.test.js
+scripts/
+  generate-og.mjs        ← npm run og
 src/
 ├── main.jsx
 ├── App.jsx
-├── config/site.js          ← única fuente de datos de contacto y claves
+├── config/site.js       ← única fuente de datos de contacto y claves
 ├── content/
-│   ├── copy.js             ← TODO el texto aprobado; no modificar sin aprobación
-│   └── images.js           ← registro de slots de foto
+│   ├── copy.js          ← TODO el texto aprobado; no modificar sin aprobación
+│   └── images.js        ← registro de slots de foto
 ├── lib/
 │   ├── whatsapp.js + whatsapp.test.js
 │   ├── submitLead.js
@@ -65,9 +86,10 @@ Mínimo. Solo transiciones que respondan a una acción (abrir menú, desplegar s
 
 ## Flujo del formulario (aprobado)
 
-Ver documento de diseño. Resumen: `preventDefault` → validar → verificar botcheck → `submitLead()` (fire-and-forget) → `trackEvent()` → `openWhatsApp()` → mostrar confirmación. El `openWhatsApp` debe llamarse síncronamente dentro del handler.
+Ver documento de diseño. Resumen: `preventDefault` → validar → verificar botcheck → `submitLead()` (fire-and-forget) → `trackEvent()` → `openWhatsApp()` (solo si `hasWhatsApp()`) → mostrar confirmación. El `openWhatsApp` debe llamarse síncronamente dentro del handler.
 
 ## Fases de construcción
 
 - **Fase 1 (completa):** scaffold, sistema de diseño, Hero, Problem, secciones vacías 3–9.
+- **Correcciones post-Fase 1 (completas):** cambio a Cloudflare Pages, guarda WhatsApp, metadatos desde plugin, og-image.
 - **Fases siguientes:** construir secciones restantes una por una según el documento de diseño.

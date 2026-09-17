@@ -1,17 +1,15 @@
-import { track } from '@vercel/analytics'
-
 /**
- * Registra un evento personalizado en Vercel Analytics.
- * Es seguro llamar aunque Analytics no esté disponible o no esté inicializado.
- * Nota: los eventos personalizados pueden requerir un plan de pago en Vercel.
+ * Capa de analítica — sin proveedor por ahora.
+ * En desarrollo imprime los eventos en consola para facilitar el debug.
+ * En producción es un no-op hasta conectar un proveedor.
+ * Las llamadas existentes a trackEvent en los componentes se mantienen sin cambios.
  *
  * @param {string} name - Nombre del evento
  * @param {Record<string, unknown>} [data] - Datos adicionales del evento
  */
 export function trackEvent(name, data) {
-  try {
-    track(name, data)
-  } catch {
-    // Analytics no disponible o no inicializado — no interrumpir el flujo
+  if (import.meta.env.DEV) {
+    console.debug('[analytics]', name, data ?? {})
   }
+  // TODO: conectar proveedor cuando esté definido (Cloudflare Web Analytics, Plausible, etc.)
 }

@@ -1,7 +1,9 @@
 import { useEffect, useRef } from 'react'
 import { X } from 'lucide-react'
 import { Logo } from '../ui/Logo.jsx'
+import { Button } from '../ui/Button.jsx'
 import { Container } from '../ui/Container.jsx'
+import { COPY } from '../../content/copy.js'
 
 /**
  * Menú móvil fullscreen accesible.
@@ -32,7 +34,9 @@ export function MobileMenu({ open, onClose, links }) {
   // Bloquear scroll del body cuando el menú está abierto
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : ''
-    return () => { document.body.style.overflow = '' }
+    return () => {
+      document.body.style.overflow = ''
+    }
   }, [open])
 
   if (!open) return null
@@ -70,6 +74,18 @@ export function MobileMenu({ open, onClose, links }) {
             {link.label}
           </a>
         ))}
+
+        {/* CTA al final de la lista — desplaza a #contacto y cierra el menú */}
+        <div className="px-6 py-5 mt-auto border-t border-line">
+          <Button
+            href="#contacto"
+            variant="primary"
+            className="w-full justify-center"
+            onClick={onClose}
+          >
+            {COPY.hero.ctaPrimary}
+          </Button>
+        </div>
       </nav>
     </div>
   )

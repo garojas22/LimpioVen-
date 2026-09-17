@@ -1,4 +1,3 @@
-import { Analytics } from '@vercel/analytics/react'
 import { Header } from './components/layout/Header.jsx'
 import { Footer } from './components/layout/Footer.jsx'
 import { WhatsAppFloat } from './components/layout/WhatsAppFloat.jsx'
@@ -60,13 +59,14 @@ export default function App() {
         {/* 8 — Cobertura (fase posterior) */}
         <Section id="cobertura" bg="bg-2" />
 
-        {/* 9 — Contacto (fase posterior) */}
+        {/* 9 — Contacto (fase posterior)
+            Nota: sin whatsappNumber válido, el formulario solo registra por correo
+            y muestra confirmación; openWhatsApp no se llama. */}
         <Section id="contacto" bg="bg" />
       </main>
 
       <Footer />
       <WhatsAppFloat />
-      <Analytics />
     </>
   )
 }

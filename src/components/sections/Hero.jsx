@@ -2,7 +2,7 @@ import { Section } from '../ui/Section.jsx'
 import { Container } from '../ui/Container.jsx'
 import { Button } from '../ui/Button.jsx'
 import { ImageSlot } from '../ui/ImageSlot.jsx'
-import { buildWaUrl, openWhatsApp } from '../../lib/whatsapp.js'
+import { hasWhatsApp, buildWaUrl, openWhatsApp } from '../../lib/whatsapp.js'
 import { trackEvent } from '../../lib/analytics.js'
 import { COPY } from '../../content/copy.js'
 
@@ -42,13 +42,17 @@ export function Hero() {
               <Button href="#contacto" variant="primary">
                 {COPY.hero.ctaPrimary}
               </Button>
-              <Button
-                variant="secondary"
-                onClick={handleWhatsApp}
-                style={{ border: '1.5px solid var(--brand)' }}
-              >
-                {COPY.hero.ctaSecondary}
-              </Button>
+
+              {/* Botón de WhatsApp: solo si el número está configurado */}
+              {hasWhatsApp() && (
+                <Button
+                  variant="secondary"
+                  onClick={handleWhatsApp}
+                  style={{ border: '1.5px solid var(--brand)' }}
+                >
+                  {COPY.hero.ctaSecondary}
+                </Button>
+              )}
             </div>
 
             {/* Línea de apoyo */}

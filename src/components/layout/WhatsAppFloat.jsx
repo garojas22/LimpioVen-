@@ -1,12 +1,15 @@
-import { buildWaUrl, openWhatsApp } from '../../lib/whatsapp.js'
+import { hasWhatsApp, buildWaUrl, openWhatsApp } from '../../lib/whatsapp.js'
 import { trackEvent } from '../../lib/analytics.js'
 import { COPY } from '../../content/copy.js'
 
 /**
- * Botón flotante de WhatsApp, siempre visible.
- * Respeta env(safe-area-inset-bottom) para notches y barras de sistema.
+ * Botón flotante de WhatsApp.
+ * No se renderiza si SITE.whatsappNumber no está configurado (hasWhatsApp() = false).
+ * Respeta env(safe-area-inset-bottom) para notches y barras del sistema.
  */
 export function WhatsAppFloat() {
+  if (!hasWhatsApp()) return null
+
   const handleClick = () => {
     const url = buildWaUrl(COPY.meta.whatsappMessage)
     trackEvent('whatsapp_click', { origen: 'flotante' })
@@ -35,7 +38,6 @@ export function WhatsAppFloat() {
         padding: 0,
       }}
     >
-      {/* WhatsApp SVG icon */}
       <svg
         width="28"
         height="28"
